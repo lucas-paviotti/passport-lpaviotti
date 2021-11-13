@@ -6,17 +6,19 @@ const mongoose = require('mongoose');
 
 const { apiRouter } = require('./routes/api.route');
 const { productoRouter } = require('./routes/producto.route');
+const { loginRouter } = require('./routes/login.route');
+const { logoutRouter } = require('./routes/logout.route');
+const { signupRouter } = require('./routes/logout.route');
 
 const { ProductoModelo } = require('./models/Producto');
 const { MensajeModelo } = require('./models/Mensaje');
+const { UsuarioModelo } = require('./models/Usuario');
 const {normalize, schema} = require('normalizr');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true};
-const bCrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const { createHash } = require('./utils/utils');
 
 const app = express();
 
@@ -25,12 +27,19 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static(`${__dirname}/public`));
 app.use('/api', apiRouter);
 app.use('/productos', productoRouter);
+app.use('/login', loginRouter);
+app.use('/logout', logoutRouter);
+app.use('/signup', signupRouter);
 
 app.use(session({
     secret: 'secreto',
     resave: true,
     saveUninitialized: false,
-    cookie: { maxAge: 600000 }
+    cookie: { 
+        httpOnly: false,
+        secure: false,
+        maxAge: 600000 
+    }
 }));
 
 app.use(passport.initialize());
@@ -97,43 +106,37 @@ const mensajesSchema = new schema.Entity('mensajes',{
 
 
 passport.use('signup', new LocalStrategy({
-    passReqToCallback: true
-},
-    function(req, username, password, done) {
-        let usuario = obtenerUsuario(usuarios, username);
-        if (usuario != undefined){
-            return done(null, false, console.log(usuario.username, 'Usuario ya existe'));
-        } else {
-            let nuevoUsuario = {
-                _id: usuarios.length + 1, 
-                username, 
-                password,
-                direccion: req.body.direccion,
-                visitas: 1
+        passReqToCallback: true
+    },
+    (req, email, password, done) => {
+        UsuarioModelo.findOne({'email': email}, (err,user) => {
+            if (err) {
+                console.log('Error en signup:' + err);
+                return done(err);
             }
-            usuarios.push(nuevoUsuario);
-            console.log(usuarios);
-            return done(null, nuevoUsuario)
-        }
+            if (user) {
+                console.log('Usuario ya existe');
+                return done(null, false, console.log('message', 'Usuario ya existe'));
+            } else {
+                const nuevoUsuario = new UsuarioModelo({
+                    username: req.body.username,
+                    password: createHash(password),
+                    email: email,
+                    firstname: req.body.firstName,
+                    lastname: req.body.lastName 
+                });
+                nuevoUsuario.save((err) => {
+                    if (err) {
+                        console.log('Error al guardar usuario:' + err);
+                        throw err;
+                    }
+                    console.log('Registro de usuario exitoso');
+                    return done(null, nuevoUsuario)
+                });
+            }
+        })
     }
 ));
-
-passport.use('login', new LocalStrategy({
-        passReqToCallback: true
-    }, 
-    function (req, username, password, done) {
-        let usuario = obtenerUsuario(usuarios, username);
-        if (usuario == undefined) {
-            return done(null, false, console.log(username, 'usuario no existe'));
-        } else {
-            if (passwordValida(usuario, password)) {
-                return done(null, usuario)  
-            } else {
-                return done(null, false, console.log(username, 'password errónea'));
-            }
-        }
-    })
-);
 
 passport.serializeUser((user, done)=>{
     done(null, user._id);
@@ -143,33 +146,6 @@ passport.deserializeUser((id, done)=>{
     let usuario = obtenerUsuarioId(usuarios, id);
     done(null, usuario);
 });
-
-app.get('/login', routes.getLogin);
-app.post('/login', passport.authenticate('login', {failureRedirect: '/faillogin'}), routes.postLogin);
-app.get('/faillogin', routes.getFailLogin);
-
-app.get('/signup', routes.getSignUp);
-app.post('/signup', passport.authenticate('signup', {failureRedirect: '/failsignup'}), routes.postSignUp);
-app.get('/failsignup', routes.getFailSignUp);
-
-app.get('/logout', routes.getLogout);
-
-app.get('/ruta-protegida', checkAuthentication, routes.getRutaProtegida);
-
-app.get('/datos', routes.getDatos);
-
-app.get('*', routes.failRoute);
-
-function checkAuthentication(req, res, next){
-    if (req.isAuthenticated()){
-        next();
-    } else {
-        res.redirect('/');
-    }
-}
-
-
-
 
 
 
@@ -202,47 +178,6 @@ app.get('/', (req, res) => {
         res.redirect('/login');
     }
 });
-
-app.get('/login', async (req, res) => {
-    if (req.session.user) {
-        res.redirect('/')
-    } else {
-        res.render('login');
-    }
-});
-
-app.post('/login/true', async (req, res) => {
-    let { nombre } = req.body;
-    req.session.user = nombre;
-    res.status(200).send({ message: "Sesión guardada correctamente." });
-});
-
-app.get('/logout', async (req, res) => {
-    if (req.session.user) {
-        res.render('logout', { nombre: req.session.user });
-        req.session.destroy();
-    } else {
-        res.redirect('/login')
-    }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 const io = new Server(server);
