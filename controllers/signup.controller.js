@@ -1,11 +1,17 @@
-const renderSignup = async (req, res) => {
-    if (req.session.user) {
-        res.redirect('/')
-    } else {
-        res.render('signup');
-    }
+const getSignup = async (req, res) => {
+    res.render('signup');
+}
+
+const postSignup = async (req, res) => {
+    res.redirect('/');
+}
+
+const failedSignup = async (req, res) => {
+    res.render('signup-error');
 }
 
 module.exports = {
-    renderSignup
+    getSignup,
+    postSignup,
+    failedSignup
 }

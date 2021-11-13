@@ -24,14 +24,29 @@ function sendForm() {
 
 function sendFormLogin() {
     const params = {
-        nombre: document.querySelector('#usuario-nombre').value,
+        username: document.querySelector('#usuario-username').value,
+        password: document.querySelector('#usuario-password').value
     }
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", '/login/true', true);
+    xhr.open("POST", '/login', true);
 
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    xhr.send(`nombre=${params.nombre}`);
+    xhr.send(`nombre=${params.username}&password=${params.password}`);
+}
 
-    window.location.href = "/";
+function sendFormSignUp() {
+    const params = {
+        username: document.querySelector('#usuario-username').value,
+        password: document.querySelector('#usuario-password').value,
+        email: document.querySelector('#usuario-email').value,
+        firstName: document.querySelector('#usuario-firstName').value,
+        lastName: document.querySelector('#usuario-lastName').value
+    }
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", '/signup', true);
+
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.send(`username=${params.username}&password=${params.password}&email=${params.email}&firstName=${params.firstName}&lastName=${params.lastName}`);
 }

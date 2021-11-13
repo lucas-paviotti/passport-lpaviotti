@@ -6,7 +6,7 @@ const print = (obj) => {
 }
 
 const createHash = (password) => {
-    return bCrypt.hashSync(password, bCrypt.getSaltSync(10), null);
+    return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
 }
 
 module.exports = {

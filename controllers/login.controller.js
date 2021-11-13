@@ -1,18 +1,17 @@
-const renderLogin = async (req, res) => {
-    if (req.session.user) {
-        res.redirect('/')
-    } else {
-        res.render('login');
-    }
+const getLogin = async (req, res) => {
+    res.render('login');
 }
 
-const loginTrue = async (req, res) => {
-    let { nombre } = req.body;
-    req.session.user = nombre;
-    res.status(200).send({ message: "Sesión guardada correctamente." });
+const postLogin = async (req, res) => {
+    res.redirect('/');
+}
+
+const failedLogin = async (req, res) => {
+    res.render('login-error');
 }
 
 module.exports = {
-    renderLogin,
-    loginTrue
+    getLogin,
+    postLogin,
+    failedLogin
 }

@@ -8,28 +8,22 @@ const { apiRouter } = require('./routes/api.route');
 const { productoRouter } = require('./routes/producto.route');
 const { loginRouter } = require('./routes/login.route');
 const { logoutRouter } = require('./routes/logout.route');
-const { signupRouter } = require('./routes/logout.route');
+const { signupRouter } = require('./routes/signup.route');
 
 const { ProductoModelo } = require('./models/Producto');
 const { MensajeModelo } = require('./models/Mensaje');
 const { UsuarioModelo } = require('./models/Usuario');
+
 const {normalize, schema} = require('normalizr');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const { createHash } = require('./utils/utils');
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static(`${__dirname}/public`));
-app.use('/api', apiRouter);
-app.use('/productos', productoRouter);
-app.use('/login', loginRouter);
-app.use('/logout', logoutRouter);
-app.use('/signup', signupRouter);
 
 app.use(session({
     secret: 'secreto',
@@ -44,6 +38,12 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use('/api', apiRouter);
+app.use('/productos', productoRouter);
+app.use('/login', loginRouter);
+app.use('/logout', logoutRouter);
+app.use('/signup', signupRouter);
 
 const server = app.listen(PORT, () => {
     console.log(`Servidor http escuchando en el puerto ${server.address().port}`);
@@ -105,46 +105,16 @@ const mensajesSchema = new schema.Entity('mensajes',{
 
 
 
-passport.use('signup', new LocalStrategy({
-        passReqToCallback: true
-    },
-    (req, email, password, done) => {
-        UsuarioModelo.findOne({'email': email}, (err,user) => {
-            if (err) {
-                console.log('Error en signup:' + err);
-                return done(err);
-            }
-            if (user) {
-                console.log('Usuario ya existe');
-                return done(null, false, console.log('message', 'Usuario ya existe'));
-            } else {
-                const nuevoUsuario = new UsuarioModelo({
-                    username: req.body.username,
-                    password: createHash(password),
-                    email: email,
-                    firstname: req.body.firstName,
-                    lastname: req.body.lastName 
-                });
-                nuevoUsuario.save((err) => {
-                    if (err) {
-                        console.log('Error al guardar usuario:' + err);
-                        throw err;
-                    }
-                    console.log('Registro de usuario exitoso');
-                    return done(null, nuevoUsuario)
-                });
-            }
-        })
-    }
-));
 
-passport.serializeUser((user, done)=>{
+
+passport.serializeUser((user, done) => {
     done(null, user._id);
 });
 
-passport.deserializeUser((id, done)=>{
-    let usuario = obtenerUsuarioId(usuarios, id);
-    done(null, usuario);
+passport.deserializeUser((id, done) => {
+    UsuarioModelo.findById(id, (err, user) => {
+        done(err, user);
+    });
 });
 
 
