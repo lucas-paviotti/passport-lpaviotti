@@ -25,6 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static(`${__dirname}/public`));
 
+app.use(cookieParser());
+
 app.use(session({
     secret: 'secreto',
     resave: true,
@@ -142,11 +144,7 @@ passport.deserializeUser((id, done) => {
 
 
 app.get('/', (req, res) => {
-    if (req.session.user) {
-        res.render('formulario', { nombre: req.session.user });
-    } else {
-        res.redirect('/login');
-    }
+    res.render('formulario', { nombre: req.session.user });
 });
 
 

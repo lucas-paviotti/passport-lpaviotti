@@ -1,5 +1,9 @@
 const getLogin = async (req, res) => {
-    res.render('login');
+    if (req.isAuthenticated()) {
+        res.redirect('/')
+    } else {
+        res.render('login');
+    }
 }
 
 const postLogin = async (req, res) => {

@@ -11,7 +11,6 @@ passport.use('signup', new LocalStrategy({
         passReqToCallback: true
     },
     (req, username, password, done) => {
-        console.log(req.body)
         UsuarioModelo.findOne({'username': username}, (err,user) => {
             if (err) {
                 console.log('Error en signup:' + err);

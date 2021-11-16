@@ -32,14 +32,18 @@ let render = (data) => {
                 </tbody>
             </table>
         `;
-        document.querySelector('.tablaproductos__wrapper').innerHTML = html;
+        if (document.querySelector('.tablaproductos__wrapper')) {
+            document.querySelector('.tablaproductos__wrapper').innerHTML = html;
+        }
     } else {
         let html = `
         <div class="text-center">
             <h2>No hay productos</h2>
         </div>
         `;
-        document.querySelector('.tablaproductos__wrapper').innerHTML = html;
+        if (document.querySelector('.tablaproductos__wrapper')) {
+            document.querySelector('.tablaproductos__wrapper').innerHTML = html;
+        }
     }
 }
 
@@ -67,7 +71,9 @@ socket.on('nuevoMensaje', (data) => {
 });
 
 let renderMensaje = (data) => {
-    document.getElementById('chat__container-compresion').innerHTML = `${data.compresion}%`;
+    if (document.getElementById('chat__container-compresion')) {
+        document.getElementById('chat__container-compresion').innerHTML = `${data.compresion}%`;
+    }
     const denormalizedData = normalizr.denormalize(data.normalizedData.result, [mensajesSchema], data.normalizedData.entities);
     let html = 
     denormalizedData.map((m)=>`
@@ -80,7 +86,9 @@ let renderMensaje = (data) => {
             <em>${m.text}</em>
         </div>
     `).join(' ');
-    document.getElementById('chat__container-chatlog').innerHTML = html;
+    if (document.getElementById('chat__container-chatlog')) {
+        document.getElementById('chat__container-chatlog').innerHTML = html;
+    }
 }
 
 const envioMensaje = () => {
