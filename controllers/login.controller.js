@@ -7,7 +7,7 @@ const getLogin = async (req, res) => {
 }
 
 const postLogin = async (req, res) => {
-    res.redirect('/');
+    res.redirect(307, '/');
 }
 
 const failedLogin = async (req, res) => {

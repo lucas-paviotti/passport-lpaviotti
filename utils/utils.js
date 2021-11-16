@@ -6,10 +6,15 @@ const print = (obj) => {
 }
 
 const createHash = (password) => {
-    return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
+    return bCrypt.hashSync(password, 10);
+}
+
+const isValidPassword = (user, password) => {
+    return bCrypt.compareSync(password, user.password);
 }
 
 module.exports = {
     print,
-    createHash
+    createHash,
+    isValidPassword
 }

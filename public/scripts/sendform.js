@@ -32,7 +32,7 @@ function sendFormLogin() {
 
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    xhr.send(`nombre=${params.username}&password=${params.password}`);
+    xhr.send(`username=${params.username}&password=${params.password}`);
 }
 
 function sendFormSignUp() {
