@@ -41,7 +41,7 @@ passport.use('signup', new LocalStrategy({
 ));
 
 signupRouter.get('/', getSignup);
-signupRouter.post('/', passport.authenticate('signup', {failureRedirect: '/failed'}), postSignup);
+signupRouter.post('/', passport.authenticate('signup', {failureRedirect: '/signup/failed'}), postSignup);
 signupRouter.get('/failed', failedSignup);
 
 module.exports = {

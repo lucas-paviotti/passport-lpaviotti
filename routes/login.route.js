@@ -27,7 +27,7 @@ passport.use('login', new LocalStrategy({
 ));
 
 loginRouter.get('/', getLogin);
-loginRouter.post('/', passport.authenticate('login', {failureRedirect: '/failed'}), postLogin);
+loginRouter.post('/', passport.authenticate('login', {failureRedirect: '/login/failed'}), postLogin);
 loginRouter.get('/failed', failedLogin);
 
 module.exports = {

@@ -1,5 +1,9 @@
 const getSignup = async (req, res) => {
-    res.render('signup');
+    if (req.isAuthenticated()) {
+        res.redirect('/')
+    } else {
+        res.render('signup');
+    }
 }
 
 const postSignup = async (req, res) => {

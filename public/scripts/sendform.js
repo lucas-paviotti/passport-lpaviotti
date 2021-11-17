@@ -23,30 +23,47 @@ function sendForm() {
 }
 
 function sendFormLogin() {
-    const params = {
-        username: document.querySelector('#usuario-username').value,
-        password: document.querySelector('#usuario-password').value
-    }
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", '/login', true);
-
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.send(`username=${params.username}&password=${params.password}`);
+    fetch('/login', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: document.querySelector('#usuario-username').value,
+            password: document.querySelector('#usuario-password').value,
+        })
+    })
+    .then((res) => {
+        window.location.href = res.url;
+    })
+    .catch((error) => {
+        console.error(error);
+    });
 }
 
 function sendFormSignUp() {
-    const params = {
-        username: document.querySelector('#usuario-username').value,
-        password: document.querySelector('#usuario-password').value,
-        email: document.querySelector('#usuario-email').value,
-        firstName: document.querySelector('#usuario-firstName').value,
-        lastName: document.querySelector('#usuario-lastName').value
-    }
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", '/signup', true);
-
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.send(`username=${params.username}&password=${params.password}&email=${params.email}&firstName=${params.firstName}&lastName=${params.lastName}`);
+    fetch('/signup', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: document.querySelector('#usuario-username').value,
+            password: document.querySelector('#usuario-password').value,
+            email: document.querySelector('#usuario-email').value,
+            firstName: document.querySelector('#usuario-firstName').value,
+            lastName: document.querySelector('#usuario-lastName').value
+        })
+    })
+    .then((res) => {
+        window.location.href = res.url;
+    })
+    .catch((error) => {
+        console.error(error);
+    });
 }
+
+
+    
